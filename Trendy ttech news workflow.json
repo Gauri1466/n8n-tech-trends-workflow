@@ -1,0 +1,248 @@
+{
+  "name": "Trendy ttech news workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 20
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -192,
+        0
+      ],
+      "id": "d4453697-0ad4-4e8e-bc84-5bccffaf1bd1",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"source\": \"Reddit\",\n  \"type\": \"Trending Tech News\",\n  \"title\": \"={{ $json.data.children[0].data.title }}\",\n  \"url\": \"={{ $json.data.children[0].data.url }}\",\n  \"subreddit\": \"={{ $json.data.children[0].data.subreddit }}\",\n  \"score\": \"={{ $json.data.children[0].data.score }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        -128
+      ],
+      "id": "7f575e87-46f5-4bef-8e00-b899dc291794",
+      "name": "Format Reddit data"
+    },
+    {
+      "parameters": {
+        "url": "https://www.reddit.com/r/technology/top.json?limit=10&t=day",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        400,
+        -128
+      ],
+      "id": "021abe81-6521-437c-bff6-9af7ff47c75d",
+      "name": "Reddit request"
+    },
+    {
+      "parameters": {
+        "url": "https://api.github.com/search/repositories?q=stars:>2000&sort=stars&order=desc",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        272,
+        80
+      ],
+      "id": "c8ee1992-d541-4620-ae45-8b62aa2494fd",
+      "name": "Github Request"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        816,
+        32
+      ],
+      "id": "709f0bb1-025f-4c4e-9390-5f0f39afcea1",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"source\": \"GitHub\",\n  \"type\": \"Trending Technology\",\n  \"project\": \"={{ $json.items[0].name }}\",\n  \"url\": \"={{ $json.items[0].html_url }}\",\n  \"stars\": \"={{ $json.items[0].stargazers_count }}\",\n  \"description\": \"={{ $json.items[0].description }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        96
+      ],
+      "id": "2cc2a338-6afe-4e08-97fb-bc79e5ee503e",
+      "name": "github data"
+    },
+    {
+      "parameters": {
+        "fromEmail": "gaurisonawane1466@gmail.com",
+        "toEmail": "gaurisonawane1466@gmail.com",
+        "subject": "Trending Tech Topics (n8n)",
+        "html": "=🔥 Source: {{$json.source}}\n\n📌 Title:\n{{$json.title || $json.project}}\n\n🔗 Link:\n{{$json.url}}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1136,
+        32
+      ],
+      "id": "d2e30dc0-d1d0-40fe-bbb9-14ac7c4ebf18",
+      "name": "Send email",
+      "webhookId": "b1c989af-7676-433d-95a0-b48159312c94",
+      "credentials": {
+        "smtp": {
+          "id": "2Doi08Cpaa21PYAr",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Daily Tech Trends Automation (n8n)\n\nAn automated workflow built using n8n that fetches daily trending\ntechnology news from Reddit and GitHub, cleans the data, and sends\na scheduled email summary.\n\n## Features\n- ⏰ Daily scheduled execution (8 PM IST)\n- 🔥 Reddit trending technology posts\n- ⭐ GitHub trending repositories\n- 🧹 Data cleaning and normalization\n- 📧 Automated email notifications\n- 🧠 AI Agent (planned)\n\n\n## Future Enhancements\n- AI agent for trend explanation\n- Daily data storage for analysis\n- Weekly trend summaries\n- Docker-based 24/7 deployment\n\n",
+        "height": 592,
+        "width": 320,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -560,
+        224
+      ],
+      "typeVersion": 1,
+      "id": "bdfae446-a446-44a3-88aa-ba2c14b855b0",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2026-01-04T05:06:26.036-05:00",
+          "Readable date": "January 4th 2026, 5:06:26 am",
+          "Readable time": "5:06:26 am",
+          "Day of week": "Sunday",
+          "Year": "2026",
+          "Month": "January",
+          "Day of month": "04",
+          "Hour": "05",
+          "Minute": "06",
+          "Second": "26",
+          "Timezone": "America/New_York (UTC-05:00)"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Reddit request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Github Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reddit request": {
+      "main": [
+        [
+          {
+            "node": "Format Reddit data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Github Request": {
+      "main": [
+        [
+          {
+            "node": "github data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Reddit data": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "github data": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "237a4a0d-4309-4302-9023-cfd545662aca",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e449553cc859aad7ae1ee7aba64097087cfc1a7e4af0a0b461f7b3879b2239d9"
+  },
+  "id": "spMctRtySYVTB8wZ",
+  "tags": []
+}
